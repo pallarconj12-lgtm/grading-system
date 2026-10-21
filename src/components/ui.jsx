@@ -64,12 +64,13 @@ export function Field({ label, error, help, className = '', children }) {
 }
 
 /** Password input with a show/hide toggle. Props go to the <input>, so it works inside <Field>. */
-export function PasswordInput({ className = '', ...props }) {
+export function PasswordInput({ className = '', icon: Icon, ...props }) {
   const [shown, setShown] = useState(false)
   const label = shown ? 'Hide password' : 'Show password'
   return (
     <div className="password-wrap">
-      <input {...props} className={`input ${className}`.trim()} type={shown ? 'text' : 'password'} />
+      {Icon && <Icon className="input-lead" size={19} aria-hidden />}
+      <input {...props} className={`input ${Icon ? 'has-lead ' : ''}${className}`.trim()} type={shown ? 'text' : 'password'} />
       <button type="button" className="password-toggle" onClick={() => setShown((v) => !v)} aria-label={label} aria-pressed={shown} title={label}>
         {shown ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
       </button>
