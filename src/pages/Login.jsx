@@ -50,7 +50,7 @@ export default function Login() {
         <div className="brand"><span className="brand-mark"><GraduationCap size={20} /></span> Classroom Gradebook</div>
         <div>
           <h1>Grades, attendance and report cards in one place.</h1>
-          <p>Built for Junior High School teachers in the Philippines. Your records stay in your school's own secure database.</p>
+          <p>Built for Junior and Senior High School teachers in the Philippines. Your records stay in your school's own secure database.</p>
         </div>
         <span className="small" style={{ color: '#9fb8aa' }}>Grading rules are configurable and must be verified against the applicable DepEd issuance.</span>
       </div>

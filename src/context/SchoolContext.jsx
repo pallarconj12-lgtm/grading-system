@@ -119,7 +119,7 @@ export function SchoolProvider({ children }) {
       sectionLabel: (id) => {
         const s = d.sections.find((x) => x.id === id)
         if (!s) return ''
-        return `${d.levels.find((l) => l.id === s.grade_level_id)?.name ?? ''} - ${s.name}`
+        return `${d.levels.find((l) => l.id === s.grade_level_id)?.name ?? ''} - ${s.strand ? `${s.strand} - ` : ''}${s.name}`
       },
       anyUnverified: d.configs.some((c) => !c.is_verified) || d.tables.some((t) => !t.is_verified),
       reload: load,

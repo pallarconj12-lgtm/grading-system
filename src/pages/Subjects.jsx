@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, BookOpen, ClipboardList } from 'lucide-react'
 import { supabase, unwrap } from '../lib/supabase.js'
 import { useSchool } from '../context/SchoolContext.jsx'
 import { useRunner } from '../lib/hooks.js'
+import { SEMESTER_LABELS, isSeniorHighLevel } from '../lib/semester.js'
 import { Alert, Badge, Button, EmptyState, Field, PageHeader, Select, Tabs, VerifiedBadge } from '../components/ui.jsx'
 import { ConfirmDialog, Modal } from '../components/Modal.jsx'
 
@@ -142,7 +143,7 @@ function AssignmentsTab() {
               <tbody>
                 {rows.map((a) => (
                   <tr key={a.id}>
-                    <td>{s.sectionLabel(a.section_id)}</td><td>{subj(a.subject_id)}</td><td>{s.memberName(a.teacher_id)}</td>
+                    <td>{s.sectionLabel(a.section_id)}</td><td>{subj(a.subject_id)}{a.semester && <> <Badge>{SEMESTER_LABELS[a.semester]}</Badge></>}</td><td>{s.memberName(a.teacher_id)}</td>
                     <td className="actions">
                       {manage && <Button size="sm" variant="ghost" icon={Trash2} aria-label="Remove assignment"
                         onClick={() => setConfirm({ title: 'Remove this assignment?', message: <p>Removing <strong>{subj(a.subject_id)}</strong> for <strong>{s.sectionLabel(a.section_id)}</strong> also permanently deletes every assessment, score and computed grade recorded for that class. Archive or reassign instead if you only want to change the teacher.</p>, run: () => remove(a) })} />}
@@ -163,14 +164,17 @@ function AssignmentsTab() {
 function AssignmentForm({ onClose }) {
   const s = useSchool()
   const { busy, run } = useRunner()
-  const [f, setF] = useState({ section_id: s.yearSections[0]?.id ?? '', subject_id: '', teacher_id: '' })
+  const [f, setF] = useState({ section_id: s.yearSections[0]?.id ?? '', subject_id: '', teacher_id: '', semester: '1' })
   const [error, setError] = useState('')
   const teachers = s.members.filter((m) => m.role === 'teacher' || m.role === 'admin')
+  const sectionLevel = s.levels.find((l) => l.id === s.yearSections.find((x) => x.id === f.section_id)?.grade_level_id)?.level
+  const needsSemester = isSeniorHighLevel(sectionLevel) && s.year.term_count === 4
   const taken = new Set(s.yearAssignments.filter((a) => a.section_id === f.section_id).map((a) => a.subject_id))
 
   async function save() {
     if (!f.section_id || !f.subject_id || !f.teacher_id) return setError('Choose a section, a subject and a teacher.')
-    const r = await run(async () => unwrap(await supabase.from('teacher_assignments').insert({ ...f, school_id: s.school.id, academic_year_id: s.year.id })), 'Teacher assigned.')
+    const payload = { section_id: f.section_id, subject_id: f.subject_id, teacher_id: f.teacher_id, semester: needsSemester ? Number(f.semester) : null }
+    const r = await run(async () => unwrap(await supabase.from('teacher_assignments').insert({ ...payload, school_id: s.school.id, academic_year_id: s.year.id })), 'Teacher assigned.')
     if (r.ok) { s.reload(); onClose() }
   }
 
@@ -181,6 +185,11 @@ function AssignmentForm({ onClose }) {
         {error && <Alert type="danger">{error}</Alert>}
         <Field label="Section"><Select value={f.section_id} onChange={(v) => setF((x) => ({ ...x, section_id: v, subject_id: '' }))} options={s.yearSections.map((x) => ({ value: x.id, label: s.sectionLabel(x.id) }))} /></Field>
         <Field label="Subject"><Select value={f.subject_id} onChange={(v) => setF((x) => ({ ...x, subject_id: v }))} placeholder="Choose..." options={s.subjects.filter((x) => x.is_active).map((x) => ({ value: x.id, label: x.name + (taken.has(x.id) ? ' (already assigned)' : ''), disabled: taken.has(x.id) }))} /></Field>
+        {needsSemester && (
+          <Field label="Semester" help="Senior High School subjects run for one semester (2 quarters). The final grade is the average of those two quarters.">
+            <Select value={f.semester} onChange={(v) => setF((x) => ({ ...x, semester: v }))} options={[{ value: '1', label: '1st Semester (Quarters 1-2)' }, { value: '2', label: '2nd Semester (Quarters 3-4)' }]} />
+          </Field>
+        )}
         <Field label="Teacher" help="Teachers must be added under Settings, Users and roles first."><Select value={f.teacher_id} onChange={(v) => setF((x) => ({ ...x, teacher_id: v }))} placeholder="Choose..." options={teachers.map((m) => ({ value: m.user_id, label: m.profiles?.full_name || m.profiles?.email }))} /></Field>
       </div>
     </Modal>

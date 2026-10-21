@@ -13,6 +13,7 @@ import { COMPONENTS, COMPONENT_LABELS, computeTermGrade, parseScoreInput, remark
 import { ExcelText, downloadCsv, parseCsv, readFileText } from '../lib/csv.js'
 import { canEditAssignment } from '../lib/permissions.js'
 import { fmtDate, fmtGrade, fmtNum, fmtPct, fullName } from '../lib/format.js'
+import { periodsForSemester } from '../lib/semester.js'
 
 const keyOf = (aid, sid) => `${aid}:${sid}`
 const display = (row) => (!row ? '' : row.is_excused ? 'X' : row.score === null || row.score === undefined ? '' : String(row.score))
@@ -42,7 +43,8 @@ export default function Gradebook() {
   const assignment = (subjOpts.find((x) => x.a.id === sel.assignment) ?? subjOpts[0])?.a
   const subject = s.subjects.find((x) => x.id === assignment?.subject_id)
   const config = s.configs.find((c) => c.id === subject?.grading_configuration_id)
-  const period = s.periods.find((p) => p.id === sel.period) ?? s.periods[0]
+  const periodOpts = periodsForSemester(s.periods, assignment?.semester, s.year.term_count)
+  const period = periodOpts.find((p) => p.id === sel.period) ?? periodOpts[0]
   const section = s.sections.find((x) => x.id === assignment?.section_id)
   const canEdit = assignment ? canEditAssignment({ role: s.role, userId: s.user.id, assignment }) && s.can('scores.write') : false
 
@@ -164,7 +166,7 @@ export default function Gradebook() {
         <Select value={levelId} onChange={(v) => setSel({ level: v, section: '', assignment: '', period: sel.period })} options={levelOpts.map((l) => ({ value: l.id, label: l.name }))} aria-label="Grade level" />
         <Select value={sectionId} onChange={(v) => setSel((x) => ({ ...x, level: levelId, section: v, assignment: '' }))} options={sectionOpts.map((x) => ({ value: x.id, label: x.name }))} aria-label="Section" />
         <Select value={assignment?.id} onChange={(v) => setSel((x) => ({ ...x, level: levelId, section: sectionId, assignment: v }))} options={subjOpts.map((x) => ({ value: x.a.id, label: x.subject?.name ?? '?' }))} aria-label="Subject" />
-        <Select value={period?.id} onChange={(v) => setSel((x) => ({ ...x, period: v }))} options={s.periods.map((p) => ({ value: p.id, label: p.name }))} aria-label="Grading period" />
+        <Select value={period?.id} onChange={(v) => setSel((x) => ({ ...x, period: v }))} options={periodOpts.map((p) => ({ value: p.id, label: p.name }))} aria-label="Grading period" />
         <span className="muted small">School year {s.year.label}</span>
       </div>
 

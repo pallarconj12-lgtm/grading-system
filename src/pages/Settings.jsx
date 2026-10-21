@@ -7,6 +7,7 @@ import { Alert, Badge, Button, EmptyState, Field, PageHeader, Select, Tabs, Veri
 import { ConfirmDialog, Modal } from '../components/Modal.jsx'
 import { validateTransmutationRows, validateWeights } from '../lib/grading/index.js'
 import { ROLE_LABELS } from '../lib/permissions.js'
+import { SHS_DESCRIPTORS } from '../lib/semester.js'
 
 export default function Settings() {
   const s = useSchool()
@@ -418,11 +419,11 @@ function OptionsTab({ admin }) {
         {desc.map((d, i) => (
           <div className="row" key={i}>
             <input className="input" style={{ width: 90 }} inputMode="numeric" value={d.min} disabled={!admin} onChange={(e) => setDesc((l) => l.map((x, j) => (j === i ? { ...x, min: e.target.value } : x)))} aria-label="Minimum grade" />
-            <input className="input" value={d.label} disabled={!admin} onChange={(e) => setDesc((l) => l.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} aria-label="Descriptor" />
+            <input className="input" style={{ flex: 1, minWidth: 0 }} value={d.label} disabled={!admin} onChange={(e) => setDesc((l) => l.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} aria-label="Descriptor" />
             {admin && <Button size="sm" variant="ghost" icon={Trash2} aria-label="Remove descriptor" onClick={() => setDesc((l) => l.filter((_, j) => j !== i))} />}
           </div>
         ))}
-        {admin && <div className="row"><Button icon={Plus} onClick={() => setDesc((l) => [...l, { min: '', label: '' }])}>Add descriptor</Button><Button variant="primary" onClick={saveOptions} disabled={busy}>Save settings</Button></div>}
+        {admin && <div className="row"><Button icon={Plus} onClick={() => setDesc((l) => [...l, { min: '', label: '' }])}>Add descriptor</Button><Button onClick={() => setDesc(SHS_DESCRIPTORS.map((d) => ({ ...d })))}>Use SHS descriptors</Button><Button variant="primary" onClick={saveOptions} disabled={busy}>Save settings</Button></div>}
       </div>
       <div className="card card-pad stack">
         <h2>Report card signatories</h2>

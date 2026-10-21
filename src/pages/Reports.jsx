@@ -9,6 +9,7 @@ import { computeGeneralAverage, descriptorFor, remarkFor } from '../lib/grading/
 import { summarizeAttendance } from '../lib/attendance.js'
 import { downloadCsv, ExcelText } from '../lib/csv.js'
 import { fmtGrade, fullName } from '../lib/format.js'
+import { SEMESTER_LABELS, periodsForSemester } from '../lib/semester.js'
 
 const OFFICIAL = new Set(['finalized', 'approved'])
 
@@ -97,8 +98,9 @@ function ReportCard({ st, section, data, shown, includeProvisional }) {
     const terms = periods.map((p) => { const g = q(a.id, p.id); return shown(g) ? g.transmuted_grade : null })
     const anyProvisional = periods.some((p) => { const g = q(a.id, p.id); return g && shown(g) && !OFFICIAL.has(g.status) })
     const f = data.finals.find((x) => x.student_id === st.id && x.assignment_id === a.id)
-    const finalShown = f && f.final_grade !== null && (OFFICIAL.has(f.status) || includeProvisional) && terms.every((t) => t !== null)
-    return { subject, passing: config?.passing_grade ?? 75, terms, final: finalShown ? f.final_grade : null, anyProvisional }
+    const counted = periodsForSemester(periods, a.semester, termCount)
+    const finalShown = f && f.final_grade !== null && (OFFICIAL.has(f.status) || includeProvisional) && counted.every((p) => terms[periods.indexOf(p)] !== null)
+    return { subject, semester: a.semester, passing: config?.passing_grade ?? 75, terms, final: finalShown ? f.final_grade : null, anyProvisional }
   })
   const general = computeGeneralAverage(rows.map((r) => r.final))
   const att = summarizeAttendance(data.attendance.filter((x) => x.student_id === st.id), s.settings)
@@ -122,7 +124,7 @@ function ReportCard({ st, section, data, shown, includeProvisional }) {
         <tbody>
           {rows.map((r) => (
             <tr key={r.subject.id}>
-              <td style={{ textAlign: 'left' }}>{r.subject.name}</td>
+              <td style={{ textAlign: 'left' }}>{r.subject.name}{r.semester ? ` (${SEMESTER_LABELS[r.semester]})` : ''}</td>
               {r.terms.map((t, i) => <td key={i} style={{ textAlign: 'center' }}>{fmtGrade(t)}</td>)}
               <td style={{ textAlign: 'center' }}><strong>{fmtGrade(r.final)}</strong></td>
               <td style={{ textAlign: 'center' }}>{r.final === null ? '' : remarkFor(r.final, r.passing)}</td>

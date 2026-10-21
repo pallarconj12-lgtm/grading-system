@@ -263,7 +263,7 @@ function ImportModal({ onClose, onDone }) {
         const lvlNum = Number(String(rec.grade_level).match(/\d+/)?.[0])
         const level = s.levels.find((l) => l.level === lvlNum)
         const section = level && s.yearSections.find((x) => x.grade_level_id === level.id && x.name.toLowerCase() === String(rec.section).trim().toLowerCase())
-        if (!level) errs.push('Grade level must be 7 to 10.')
+        if (!level) errs.push('Grade level must be 7 to 12.')
         else if (!section) errs.push(`Section "${rec.section}" does not exist for ${level.name} this year (or you cannot access it).`)
         if (v.clean.lrn && seen.has(v.clean.lrn)) errs.push('Duplicate LRN inside the file.')
         seen.add(v.clean.lrn)

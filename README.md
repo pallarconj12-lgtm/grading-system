@@ -1,6 +1,6 @@
 # Classroom Gradebook
 
-A grading, attendance and report-card web app for Philippine Junior High School (Grades 7-10) teachers.
+A grading, attendance and report-card web app for Philippine Junior and Senior High School (Grades 7-12) teachers.
 React + Vite, Supabase (PostgreSQL, Auth, Row Level Security), deployable on Vercel.
 
 > **Read this first: grading rules are NOT verified.**
@@ -25,6 +25,18 @@ React + Vite, Supabase (PostgreSQL, Auth, Row Level Security), deployable on Ver
 - **Roles**: administrator, teacher, reviewer / school head, enforced by Row Level Security in the database, not just hidden buttons.
 - **Audit log** of changes to scores, attendance, learners, rules and approvals.
 - **Privacy**: collects only what grading needs (name, LRN, sex, section). No birth dates, addresses or contact details.
+
+## Senior High School (Grades 11-12)
+
+Run `supabase/migrations/0005_senior_high.sql` (after 0001-0004) on an existing database; new setups get it automatically.
+
+- **Grade levels 11 and 12** are added for every school. Sections for these levels have an optional **strand** (STEM, ABM, HUMSS, GAS, TVL ...).
+- **Semesters.** Choose **4 quarters** for the school year. When you assign a teacher to a Grade 11 or 12 section you pick the
+  semester (1st = quarters 1-2, 2nd = quarters 3-4). The gradebook then shows only those two quarters and the subject's
+  final grade is the average of them. Grades 7-10 are unchanged (whole year).
+- **SHS grading rules** (weights 25/45/30 and 20/60/20, and the 60 -> 75 transmutation table) are added as defaults,
+  flagged *not verified* like every other rule. Descriptors: Settings, Attendance and reports, **Use SHS descriptors**.
+- Not covered: Work Immersion / Research weights (add your own rule in Settings, Grading rules), and a separate descriptor set per level.
 
 ## Project layout
 
