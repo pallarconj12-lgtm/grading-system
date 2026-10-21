@@ -51,11 +51,24 @@ export default function Login() {
         <div>
           <h1>Grades, attendance and report cards in one place.</h1>
           <p>Built for Junior and Senior High School teachers in the Philippines. Your records stay in your school's own secure database.</p>
+          <div className="ledger" aria-hidden="true">
+            <div className="ledger-title"><span>Sample class record</span><span>Quarter 1</span></div>
+            <table>
+              <thead><tr><th>Learner</th><th>WW</th><th>PT</th><th>QA</th><th>Grade</th></tr></thead>
+              <tbody>
+                <tr><td>Learner A</td><td>92</td><td>95</td><td>88</td><td>93</td></tr>
+                <tr><td>Learner B</td><td>85</td><td>90</td><td>82</td><td>89</td></tr>
+                <tr><td>Learner C</td><td>78</td><td>84</td><td>80</td><td>84</td></tr>
+                <tr><td>Learner D</td><td>74</td><td>70</td><td>66</td><td>74</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <span className="small" style={{ color: '#9fb8aa' }}>Grading rules are configurable and must be verified against the applicable DepEd issuance.</span>
+        <span className="small auth-note">Grading rules are configurable and must be verified against the applicable DepEd issuance.</span>
       </div>
       <div className="auth-form">
         <form className="auth-card stack" onSubmit={submit} noValidate>
+          <div className="auth-brand-mobile"><span className="brand-mark"><GraduationCap size={20} /></span> Classroom Gradebook</div>
           <div>
             <h1>{title}</h1>
             <p className="muted" style={{ marginTop: 4 }}>
@@ -75,17 +88,17 @@ export default function Login() {
               <PasswordInput value={form.password} onChange={set('password')} autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
             </Field>
           )}
-          <Button type="submit" variant="primary" disabled={busy}>{busy ? 'Please wait...' : title}</Button>
-          <div className="row between small">
+          {mode === 'signin' && (
+            <div className="auth-forgot"><button type="button" className="auth-link" onClick={() => setMode('reset')}>Forgot password?</button></div>
+          )}
+          <Button type="submit" variant="primary" className="auth-submit" disabled={busy}>{busy ? 'Please wait...' : title}</Button>
+          <p className="auth-switch">
             {mode === 'signin' ? (
-              <>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setMode('reset')}>Forgot password?</button>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setMode('signup')}>Create an account</button>
-              </>
+              <>New to Classroom Gradebook? <button type="button" className="auth-link" onClick={() => setMode('signup')}>Create an account</button></>
             ) : (
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setMode('signin')}>Back to sign in</button>
+              <button type="button" className="auth-link" onClick={() => setMode('signin')}>Back to sign in</button>
             )}
-          </div>
+          </p>
         </form>
       </div>
     </div>
