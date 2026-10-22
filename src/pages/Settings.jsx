@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Plus, Trash2, RefreshCw, FlaskConical, Info } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Plus, Trash2, RefreshCw, FlaskConical, Info, ImagePlus, Upload } from 'lucide-react'
 import { supabase, fetchAll, unwrap } from '../lib/supabase.js'
 import { useSchool } from '../context/SchoolContext.jsx'
 import { useRunner } from '../lib/hooks.js'
@@ -7,6 +7,7 @@ import { Alert, Badge, Button, EmptyState, Field, PageHeader, Select, Tabs, Veri
 import { ConfirmDialog, Modal } from '../components/Modal.jsx'
 import { validateTransmutationRows, validateWeights } from '../lib/grading/index.js'
 import { ROLE_LABELS } from '../lib/permissions.js'
+import { logoUrl, saveLogo, removeLogo } from '../lib/schoolLogo.js'
 import { SHS_DESCRIPTORS } from '../lib/semester.js'
 
 export default function Settings() {
@@ -45,7 +46,22 @@ function SchoolTab({ admin }) {
   const { busy, run } = useRunner()
   const [f, setF] = useState({ name: s.school.name ?? '', school_code: s.school.school_code ?? '', division: s.school.division ?? '', region: s.school.region ?? '', address: s.school.address ?? '' })
   const [error, setError] = useState('')
+  const fileRef = useRef(null)
+  const url = logoUrl(s.school.logo_path)
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }))
+  async function pickLogo(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setError('')
+    const r = await run(() => saveLogo(s.school, file), 'School logo saved.')
+    if (r.ok) s.reload()
+  }
+  async function dropLogo() {
+    setError('')
+    const r = await run(() => removeLogo(s.school), 'School logo removed.')
+    if (r.ok) s.reload()
+  }
   async function save() {
     if (!f.name.trim()) return setError('Enter the school name.')
     setError('')
@@ -58,6 +74,20 @@ function SchoolTab({ admin }) {
     <div className="card card-pad stack" style={{ maxWidth: 720 }}>
       <h2>School details</h2>
       {error && <Alert type="danger">{error}</Alert>}
+      <div className="logo-upload">
+        <div className="logo-preview">{url ? <img src={url} alt="School logo" /> : <ImagePlus size={26} aria-hidden />}</div>
+        <div className="stack" style={{ gap: 8 }}>
+          <strong>School logo</strong>
+          <span className="muted small">PNG, JPG or WebP. It is resized automatically and shown before your school name.</span>
+          {admin && (
+            <div className="row">
+              <Button icon={Upload} onClick={() => fileRef.current?.click()} disabled={busy}>{url ? 'Change logo' : 'Upload logo'}</Button>
+              {url && <Button variant="ghost" icon={Trash2} onClick={dropLogo} disabled={busy}>Remove</Button>}
+              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={pickLogo} />
+            </div>
+          )}
+        </div>
+      </div>
       <div className="form-grid">
         <Field label="School name" className="full"><input className="input" value={f.name} onChange={set('name')} disabled={!admin} /></Field>
         <Field label="School ID / code"><input className="input" value={f.school_code} onChange={set('school_code')} disabled={!admin} /></Field>

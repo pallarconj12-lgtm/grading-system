@@ -7,7 +7,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSchool } from '../context/SchoolContext.jsx'
 import { ROLE_LABELS } from '../lib/permissions.js'
-import { Select } from './ui.jsx'
+import { Select, SchoolLogo } from './ui.jsx'
 
 const NAV = [
   { to: '/', label: 'Overview', icon: LayoutDashboard, end: true },
@@ -59,7 +59,8 @@ export default function Layout() {
       <div className="main">
         <header className="topbar no-print">
           <button className="btn btn-icon menu-btn" onClick={() => setOpen(true)} aria-label="Open menu"><Menu size={20} /></button>
-          <div className="grow">
+          <div className="grow school-title">
+            <SchoolLogo school={s.school} size={36} />
             <strong style={{ fontFamily: 'var(--font-head)' }}>{s.school.name}</strong>
           </div>
           <label className="row small muted" style={{ gap: 8 }}>

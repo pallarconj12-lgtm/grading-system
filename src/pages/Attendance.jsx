@@ -3,7 +3,7 @@ import { CalendarCheck, Download, Printer, CheckCheck } from 'lucide-react'
 import { supabase, fetchAll, unwrap } from '../lib/supabase.js'
 import { useSchool } from '../context/SchoolContext.jsx'
 import { useAsync, useRunner } from '../lib/hooks.js'
-import { Alert, Badge, Button, EmptyState, Field, Loading, PageHeader, Select, Tabs } from '../components/ui.jsx'
+import { Alert, Badge, Button, EmptyState, Field, Loading, PageHeader, SchoolLogo, Select, Tabs } from '../components/ui.jsx'
 import { ATTENDANCE_LABELS, ATTENDANCE_STATUSES, groupAttendance, monthKey, summarizeAttendance } from '../lib/attendance.js'
 import { downloadCsv, ExcelText } from '../lib/csv.js'
 import { fmtDate, fmtPct, fullName, todayIso } from '../lib/format.js'
@@ -164,7 +164,7 @@ function Report({ section }) {
       {loading && !data ? <Loading /> : error ? <div className="card-pad"><Alert type="danger">{error.message}</Alert></div> : (
         <div className="sheet-print" style={{ display: 'block' }}>
           <div className="card-pad">
-            <h2>{s.school.name} - Monthly Attendance</h2>
+            <div className="school-heading left"><SchoolLogo school={s.school} size={40} /><h2>{s.school.name} - Monthly Attendance</h2></div>
             <p className="muted">{s.sectionLabel(section.id)} - {monthKey(month)} - {daysRecorded} day(s) with records - Rate {fmtPct(total.rate, 1)}
               <span className="no-print"> - Late counts as present: {s.settings?.late_counts_as_present ? 'yes' : 'no'}; Excused counts as present: {s.settings?.excused_counts_as_present ? 'yes' : 'no'} (change in Settings)</span></p>
           </div>

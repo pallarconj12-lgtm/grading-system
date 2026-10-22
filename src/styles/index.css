@@ -200,6 +200,17 @@ table.table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
 .modal-body { padding: 20px; overflow-y: auto; }
 .modal-foot { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 
+/* ---------- school logo ---------- */
+.school-logo { display: block; width: auto; object-fit: contain; flex: none; }
+.school-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.school-heading { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.school-heading.left { justify-content: flex-start; }
+.school-heading h2 { margin: 0; }
+.logo-upload { display: flex; align-items: center; gap: 18px; padding: 14px; border: 1px dashed var(--line); border-radius: 12px; background: var(--sage-50); }
+.logo-preview { width: 84px; height: 84px; flex: none; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); overflow: hidden; }
+.logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+@media (max-width: 520px) { .logo-upload { flex-direction: column; align-items: flex-start; } }
+
 /* ---------- auth ---------- */
 .auth-wrap { --a-navy: #1b2f66; --a-blue: #1a66c2; --a-blue-dark: #1556a5; --a-line: #d3deee; --a-ink: #5b6b8a;
   min-height: 100%; position: relative; overflow: hidden; background: #f2f6fc; display: grid; place-items: center; }

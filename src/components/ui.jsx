@@ -1,4 +1,5 @@
 import { Search, Inbox, AlertTriangle, Info, CheckCircle2, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
+import { logoUrl } from '../lib/schoolLogo.js'
 import { cloneElement, isValidElement, useId, useState } from 'react'
 
 export function Button({ variant = 'default', size, icon: Icon, children, className = '', ...props }) {
@@ -61,6 +62,13 @@ export function Field({ label, error, help, className = '', children }) {
       {error && <span className="err" id={`${id}-e`}>{error}</span>}
     </div>
   )
+}
+
+/** The school's logo, shown right before its name. Renders nothing when no logo has been uploaded. */
+export function SchoolLogo({ school, size = 32 }) {
+  const url = logoUrl(school?.logo_path)
+  if (!url) return null
+  return <img className="school-logo" src={url} alt="" width={size} height={size} style={{ height: size, maxWidth: size * 2 }} />
 }
 
 /** Password input with a show/hide toggle. Props go to the <input>, so it works inside <Field>. */

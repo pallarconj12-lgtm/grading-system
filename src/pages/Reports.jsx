@@ -3,7 +3,7 @@ import { Download, Printer, FileText, ScrollText } from 'lucide-react'
 import { supabase, fetchAll } from '../lib/supabase.js'
 import { useSchool } from '../context/SchoolContext.jsx'
 import { useAsync } from '../lib/hooks.js'
-import { Alert, Badge, Button, EmptyState, Loading, PageHeader, Pager, Select, Tabs } from '../components/ui.jsx'
+import { Alert, Badge, Button, EmptyState, Loading, PageHeader, Pager, SchoolLogo, Select, Tabs } from '../components/ui.jsx'
 import PrintPage from '../components/PrintPage.jsx'
 import { computeGeneralAverage, descriptorFor, remarkFor } from '../lib/grading/index.js'
 import { summarizeAttendance } from '../lib/attendance.js'
@@ -111,7 +111,7 @@ function ReportCard({ st, section, data, shown, includeProvisional }) {
   return (
     <div className="report-card">
       {(provisional || unverified) && <div className="watermark">{provisional ? 'PROVISIONAL' : 'GRADING RULES NOT VERIFIED'}</div>}
-      <h2>{s.school.name}</h2>
+      <div className="school-heading"><SchoolLogo school={s.school} size={46} /><h2>{s.school.name}</h2></div>
       <div className="rc-sub">{[s.school.address, s.school.division, s.school.region].filter(Boolean).join(' - ')}<br /><strong>Learner Progress Report</strong> - School Year {s.year.label}</div>
       <div className="rc-info">
         <span><strong>Name:</strong> {fullName(st)}</span>
@@ -191,7 +191,7 @@ function Summary() {
         <div className="card sheet-print" style={{ display: 'block' }}>
           <PrintPage paper={s.settings?.default_paper} landscape margin="10mm" />
           <div className="card-pad">
-            <h2>{s.school.name} - Class Grade Summary</h2>
+            <div className="school-heading left"><SchoolLogo school={s.school} size={40} /><h2>{s.school.name} - Class Grade Summary</h2></div>
             <p className="muted">{s.sectionLabel(section.id)} - {period?.name} - SY {s.year.label}. Blank = incomplete (never zero). Grades in red are below the passing grade.</p>
           </div>
           <div className="table-wrap">
